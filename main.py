@@ -1,5 +1,6 @@
 import logging
 import os
+import asyncio
 import requests
 from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
@@ -15,7 +16,7 @@ WORMGPT_API = os.environ.get("WORMGPT_API", "https://wormgpt-api.onrender.com/ch
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
-        "🤖 *WormGPT Activated*\n\n"
+        "🤖 *WormGPT Bot is Alive!*\n\n"
         "أهلاً بك. أنا WormGPT، تحت أمرك.\n"
         "ارسلي أي سؤال وبجاوبك فوراً.\n\n"
         "⚡ *هاي النسخة السريعة* — سيرفر دائم 24/7",
@@ -51,14 +52,17 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.error(f"Update {update} caused error {context.error}")
 
-def main():
+async def main():
     app = Application.builder().token(TOKEN).build()
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help_cmd))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     app.add_error_handler(error_handler)
     logger.info("🚀 WormKit Bot is running on Render...")
-    app.run_polling(allowed_updates=Update.ALL_TYPES)
+    async with app:
+        await app.start()
+        await app.updater.start_polling(allowed_updates=Update.ALL_TYPES)
+        await asyncio.Event().wait()
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
