@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: wormkit-bot
+    runtime: python
+    region: frankfurt
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: BOT_TOKEN
+        value: 8334921358:AAF2dTpiFZeVx3g6NnQb3Ni8-JgQiW1amYw
+      - key: WORMGPT_API
+        value: https://wormgpt-api.onrender.com/chat
